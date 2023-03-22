@@ -1,0 +1,55 @@
+---
+- name: Install cockpit and configure it across all hosts
+  hosts: all
+
+  tasks:
+    - name: make sure cockpit is installed
+      when: "ansible_pkg_mgr == 'dnf'"
+      ansible.builtin.dnf:
+        name: cockpit
+        state: latest
+
+  #  - name: make sure cockpit extras are installed
+   #   when: "ansible_pkg_mgr == 'dnf'"
+    #  ansible.builtin.dnf:
+     #   name:
+      #    - cockpit-dashboard
+       #   - cockpit-podman
+        #  - cockpit-machines
+         # - cockpit-networkmanager
+         # - cockpit-packagekit
+         # - cockpit-storaged
+        #state: latest
+
+    - name: open up the port in the firewall
+      when: "ansible_pkg_mgr == 'dnf'"
+      ansible.builtin.firewalld:
+        service: cockpit
+        permanent: true
+        state: enabled
+
+    - name: start the cockpit service
+      notify:
+       # - reboot nodes
+       # - test connection
+      when: "ansible_pkg_mgr == 'dnf'"
+      ansible.builtin.service:
+        name: cockpit
+        state: started
+        enabled: true
+
+    - name: test connection
+      when: "ansible_pkg_mgr == 'dnf'"
+      register: output
+      ansible.builtin.uri:
+        url: https://{{ ansible_default_ipv4.address }}:9090
+        validate_certs: no
+
+    - name: see output
+      when: "ansible_pkg_mgr == 'dnf'"
+      ansible.builtin.debug:
+        msg: "{{ ansible_default_ipv4.address }}"
+
+  handlers:
+   # - name: reboot nodes
+    #  when: "ansible_pkg_mgr =='dnf'""
