@@ -1,0 +1,14 @@
+---
+- name: Facts demo
+  hosts: linux
+  gather_facts: true
+  become: true
+
+  tasks:
+
+    - name: Ensure that important facts are displayed
+      ansible.builtin.debug:
+        msg: |
+          My system name: {{ ansible_facts['hostname'] }}
+          My FQDN: {{ ansible_facts['fqdn'] }}
+          My OS: {{ansible_facts['distribution'] }}
