@@ -1,0 +1,23 @@
+- name: Update ALL Linux Systems
+  hosts: Linux
+  gather_facts: true
+  become: true
+
+  tasks: 
+    - name: RHEL DNF Install Updates
+      when: "ansible_facts['ansible_pkg_mgr == dnf']" 
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest 
+    - name: RHEL YUM Install Updates
+      when: "ansible_facts['ansible_pkg_mgr == yum']"
+      ansible.builtin.yum:
+        name: "*"
+        state: latest
+    - name: Debian Install Updates
+      when: "ansible_facts['ansible_pkg_mgr == apt']"
+      ansible.builting.apt:
+        update_cache: yes
+        cache_valid_time: 7200
+        upgrade: full
+        only_upgrade: yes 
