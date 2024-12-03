@@ -1,0 +1,17 @@
+- name: Deploy root public key to all nodes for passwordless SSH
+  hosts: all
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Ensure the .ssh directory exists
+      ansible.builtin.file:
+        path: /root/.ssh
+        state: directory
+        mode: 0700
+
+    - name: Deploy my root public key
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
+        state: present
