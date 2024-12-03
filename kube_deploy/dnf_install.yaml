@@ -1,0 +1,8 @@
+---
+- name: Install Required packages
+  hosts: all
+  tasks:
+   - name: "install container-tools"
+     ansible.builtin.dnf:
+       name: container-tools
+       state: present
