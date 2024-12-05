@@ -1,0 +1,48 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Download kubectl binary
+      get_url:
+        url: "https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Verify kubectl installation
+      command: kubectl version --client
+
+    - name: Create the kubeconfig directory
+      ansible.builtin.file:
+        path: /root/.kube
+        state: directory
+        mode: 0755
+
+    - name: Fetch kubeconfig from control plane node
+      ansible.builtin.fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        flat: yes
+      delegate_to: mainrhel
+      become: true
+
+    - name: Set KUBECONFIG environment variable
+      ansible.builtin.lineinfile:
+        path: /root/.bashrc
+        line: 'export KUBECONFIG=/root/.kube/config'
+        create: yes
+
+    - name: Add alias for kubectl
+      ansible.builtin.lineinfile:
+        path: /root/.bashrc
+        line: 'alias k=kubectl'
+        create: yes
+
+    - name: Enable tab auto-completion
+      shell: source <(kubectl completion bash)" >> ~/.bashrc
+      args:
+        executable: /bin/bash
+
+    - name: Apply tab auto-completion
+      shell: source ~/.bashrc
+      args:
+        executable: /bin/bash
