@@ -1,8 +1,17 @@
 ---
-- name: Install Required packages
+# Update Username and Password
+- name: Ensure system is registerd
   hosts: all
   tasks:
-   - name: "install container-tools"
-     ansible.builtin.dnf:
-       name: container-tools
-       state: present
+    - name: register systems
+      community.general.redhat_subscription:
+        username: "username"
+        password: "password"
+
+- name: RHEL DNF Install Updates
+  hosts: all
+  tasks:
+    - name: update systems
+      ansible.builtin.dnf:
+         name: "*"
+         state: latest
