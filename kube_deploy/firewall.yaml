@@ -5,6 +5,7 @@
     - name: Open ports for Master Node
       vars:
         ports_to_open:
+          - 179/tcp
           - 6443/tcp
           - 2379-2380/tcp
           - 10250/tcp
@@ -14,6 +15,7 @@
         port: "{{ item }}"
         permanent: true
         state: enabled
+        immediate: yes
       loop: "{{ ports_to_open }}"
 
 - name: Open Ports for Worker Nodes
@@ -22,6 +24,7 @@
     - name: Open Ports for Worker Nodes
       vars:
         worker_ports:
+          - 179/tcp
           - 10250/tcp
           - 10256/tcp
           - 30000-32767/tcp
@@ -29,4 +32,27 @@
         port: "{{ item }}"
         permanent: true
         state: enabled
+        immediate: yes
       loop: "{{ worker_ports }}"
+
+- name: Enable port forwarding
+  hosts: all
+  tasks:
+    - name: Load br_netfilter kernel module
+      modprobe:
+        name: br_netfilter
+        state: present
+
+    - name: Enable bridge netfilter for iptables
+      sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: 1
+        state: present
+        reload: yes
+
+    - name: Enable IPv4 forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: 1
+        state: present
+        reload: yes
