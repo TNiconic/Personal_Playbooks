@@ -6,6 +6,7 @@
       vars:
         ports_to_open:
           - 179/tcp
+          - 5473/tcp
           - 6443/tcp
           - 2379-2380/tcp
           - 10250/tcp
@@ -25,6 +26,7 @@
       vars:
         worker_ports:
           - 179/tcp
+          - 5473/tcp
           - 10250/tcp
           - 10256/tcp
           - 30000-32767/tcp
