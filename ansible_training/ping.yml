@@ -1,0 +1,21 @@
+---
+- name: ping rhel9 hosts
+  gather_facts: false
+  hosts: Rhel9
+  tasks:
+    - name: ping hosts
+      ping:
+
+- name: ping rhel8 hosts
+  gather_facts: false
+  hosts: Rhel8
+  tasks:
+    - name: ping hosts
+      ping:
+
+- name: ping all hosts
+  gather_facts: false
+  hosts: CRIA
+  tasks:
+    - name: ping hosts
+      ping:

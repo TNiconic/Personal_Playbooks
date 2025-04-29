@@ -1,0 +1,9 @@
+- hosts: Rhel9
+  gather_facts: no
+  vars_files:
+    /home/mitchell/ansible_training/passwords.yml
+  vars:
+    ansible_become_pass: "{{ become_pass }}"
+  ignore_errors: True
+  roles:
+    - rhel9STIG

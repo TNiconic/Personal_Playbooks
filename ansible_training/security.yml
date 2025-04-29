@@ -1,0 +1,53 @@
+---
+- hosts: all, localhost
+  vars_files:
+    /home/mitchell/ansible_training/passwords.yml
+  vars:
+    ansible_become_pass: "{{ become_pass }}"
+  tasks:
+    - name: Create ansible_svc user
+      user:
+        name: ansible_svc
+        create_home: yes
+        shell: /bin/bash
+        password: "{{ become_pass | password_hash('sha512') }}"
+        groups: wheel
+        append: yes
+        
+    - name: Create .ssh directory for ansible_svc
+      file:
+        path: /home/ansible_svc/.ssh
+        state: directory
+        owner: ansible_svc
+        group: ansible_svc
+        mode: '0700'
+
+    - name: Generate SSH keys for ansible_svc
+      become_user: ansible_svc
+      openssh_keypair:
+        path: ~/.ssh/id_rsa
+        state: present
+        size: 4096
+
+    - name: Copy public key to authorized_keys
+      become_user: ansible_svc
+      authorized_key:
+        user: ansible_svc
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        state: present
+
+    - name: Set permissions on ansible_svc's .ssh directory
+      file:
+        path: /home/ansible_svc/.ssh
+        owner: ansible_svc
+        group: ansible_svc
+        mode: '0700'
+        state: directory
+
+    - name: Set permissions on ansible_svc's authorized_keys file
+      file:
+        path: /home/ansible_svc/.ssh/authorized_keys
+        owner: ansible_svc
+        group: ansible_svc
+        mode: '0600'
+        state: file

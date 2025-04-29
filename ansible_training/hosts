@@ -1,0 +1,9 @@
+[Rhel8]
+rhel8cria ansible_host=192.168.1.96
+
+[Rhel9]
+rhel9cria ansible_host=192.168.1.154
+
+[CRIA:children]
+Rhel8
+Rhel9
